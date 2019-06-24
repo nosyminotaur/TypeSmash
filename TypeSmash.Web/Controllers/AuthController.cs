@@ -55,8 +55,10 @@ namespace TypeSmash.Web.Controllers
             string token = JWTHelper.GenerateToken(result.email, result.username, secretKey, EXPIRE_TIME);
             Response.Cookies.Append(JWT_COOKIE_NAME, token, new Microsoft.AspNetCore.Http.CookieOptions
             {
-                HttpOnly = true
+                HttpOnly = true,
+                Expires = System.DateTime.Now.AddMonths(1),
             });
+
             return Ok(result);
         }
 
@@ -87,6 +89,18 @@ namespace TypeSmash.Web.Controllers
                 return Ok(result);
             }
             return BadRequest(result);
+        }
+
+        //Simply expire the jwt cookie now to remove it
+        [AllowAnonymous]
+        [HttpGet("logout")]
+        public IActionResult SignOut()
+        {
+            Response.Cookies.Append(JWT_COOKIE_NAME, string.Empty, new Microsoft.AspNetCore.Http.CookieOptions 
+            {
+                Expires = System.DateTime.Now.AddDays(-1),
+            });
+            return Ok();
         }
     }
 }

@@ -4,14 +4,15 @@ export const userService = {
     logout
 };
 
+import Axios from "axios";
+
 async function usernameLogin(username, password) {
-    const requestOptions = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-    };
-    await sleep(20000);
-    const response = await fetch("api/auth/username-login", requestOptions);
+    const data = {
+        username,
+        password
+    }
+
+    const response = await Axios.post("api/auth/username-login", data)
     if (response.status === 200) {
         return true;
     }
@@ -19,12 +20,12 @@ async function usernameLogin(username, password) {
 }
 
 async function emailLogin(email, password) {
-    const requestOptions = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-    };
-    const response = await fetch("/api/auth/username-login", requestOptions);
+    const data = {
+        email,
+        password
+    }
+
+    const response = await Axios.post("api/auth/email-login", data)
     if (response.status === 200) {
         return true;
     }
@@ -33,7 +34,7 @@ async function emailLogin(email, password) {
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
-  }  
+}
 
 function logout() {
     // remove user from local storage to log user out
