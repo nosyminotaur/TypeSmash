@@ -1,6 +1,7 @@
 export const userService = {
     usernameLogin,
     emailLogin,
+    signup,
     logout
 };
 
@@ -14,29 +15,43 @@ async function usernameLogin(username, password) {
 
     const response = await Axios.post("api/auth/username-login", data)
     if (response.status === 200) {
-        return true;
+        return Promise.resolve();
     }
-    return false;
+    return Promise.reject(response.data);
 }
 
 async function emailLogin(email, password) {
     const data = {
         email,
         password
-    }
+    };
 
     const response = await Axios.post("api/auth/email-login", data)
     if (response.status === 200) {
-        return true;
+        return Promise.resolve();
     }
-    return false;
+    return Promise.reject(response.data);
+}
+
+async function signup(email, username, password) {
+    const data = {
+        email,
+        username,
+        password
+    };
+
+    const response = await Axios.post("api/auth/signup", data);
+    if (response.status === 200) {
+        return Promise.resolve();
+    }
+    return Promise.reject(response.data);
 }
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function logout() {
-    // remove user from local storage to log user out
-    localStorage.removeItem('loggedIn');
+async function logout() {
+    const response = await Axios.get("api/auth/logout");
+    return (response.status === 200);
 }

@@ -56,6 +56,12 @@
                 loginAllowed: true,
             }
         },
+        beforeCreate: function () {
+            if (checkers.isStillLoggedIn()) {
+                console.log("logged in");
+                router.push({ path: "/game" });
+            }
+        },
         methods: {
             handleSubmit(e) {
                 const { userdata, password } = this;
@@ -72,18 +78,12 @@
 
                 if (this.logintype === LOGINTYPE.USERNAME) {
                     userService.usernameLogin(userdata, password)
-                        .then((success) => {
-                            if (success) {
-                                router.push("game");
-                            } else {
-                                this.error = "Invalid Credentials!";
-                                this.loading = false;
-                                this.submitted = false;
-                                this.clearCredentials();
-                            }
+                        .then(() => {
+                                console.log("Pushing to game!");
+                                router.push("/game");
                         }).catch(
                             error => {
-                                this.error = error;
+                                this.error = this.getReadbleErrors(error.errors);
                                 this.loading = false;
                                 this.submitted = false;
                                 this.clearCredentials();
@@ -93,18 +93,12 @@
 
                 if (this.logintype === LOGINTYPE.EMAIL) {
                     userService.emailLogin(userdata, password)
-                        .then((success) => {
-                            if (success) {
+                        .then(() => {
+                                console.log("Pushing to game!");
                                 router.push("/game");
-                            } else {
-                                this.error = "Invalid Credentials!";
-                                this.loading = false;
-                                this.submitted = false;
-                                this.clearCredentials();
-                            }
                         }).catch(
                             error => {
-                                this.error = error;
+                                this.error = this.getReadbleErrors(error.errors);
                                 this.loading = false;
                                 this.submitted = false;
                                 this.clearCredentials();
@@ -115,7 +109,20 @@
             clearCredentials() {
                 this.userdata = "";
                 this.password = "";
-            }
+            },
+            getReadbleErrors(errors) {
+                //Run only if type of errors is Array
+                if (Array.isArray(errors)) {
+                    let finalError = `<ul>`;
+                    let len = errors.length;
+                    for (var i = 0; i < len; i++) {
+                        finalError = finalError + `<li>` + errors[i] + `</li>`;
+                    }
+                    finalError = finalError + "</ul>"
+                    return finalError;
+                }
+                return errors;
+            },
         },
         watch: {
             userdata: function () {
@@ -180,7 +187,7 @@
         margin: 2rem 0 0 0;
         font-size: 1.2rem;
         background-color: #f1dada;
-background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 4 4'%3E%3Cpath fill='%236200ff' fill-opacity='0.4' d='M1 3h1v1H1V3zm2-2h1v1H3V1z'%3E%3C/path%3E%3C/svg%3E");
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 4 4'%3E%3Cpath fill='%236200ff' fill-opacity='0.4' d='M1 3h1v1H1V3zm2-2h1v1H3V1z'%3E%3C/path%3E%3C/svg%3E");
         height: 100%;
     }
 
